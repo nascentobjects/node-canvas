@@ -56,6 +56,7 @@ class Canvas: public Nan::ObjectWrap {
     static void Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target);
     static NAN_METHOD(New);
     static NAN_METHOD(ToBuffer);
+    static NAN_METHOD(ToUncompressedBuffer);
     static NAN_GETTER(GetType);
     static NAN_GETTER(GetWidth);
     static NAN_GETTER(GetHeight);

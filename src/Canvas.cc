@@ -39,6 +39,7 @@ Canvas::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
   // Prototype
   Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
   Nan::SetPrototypeMethod(ctor, "toBuffer", ToBuffer);
+  Nan::SetPrototypeMethod(ctor, "toUncompressedBuffer", ToUncompressedBuffer);
   Nan::SetPrototypeMethod(ctor, "streamPNGSync", StreamPNGSync);
 #ifdef HAVE_JPEG
   Nan::SetPrototypeMethod(ctor, "streamJPEGSync", StreamJPEGSync);
@@ -220,6 +221,21 @@ Canvas::EIO_AfterToBuffer(eio_req *req) {
 #if !NODE_VERSION_AT_LEAST(0, 6, 0)
   return 0;
 #endif
+}
+
+/*
+ * Convert image data to a node::Buffer
+ */
+NAN_METHOD(Canvas::ToUncompressedBuffer) {
+    Canvas * canvas = Nan::ObjectWrap::Unwrap<Canvas>(info.This());
+
+    cairo_surface_flush(canvas->_surface);
+    int stride = cairo_image_surface_get_stride(canvas->_surface);
+    char * data = (char *)cairo_image_surface_get_data(canvas->_surface);
+    int len = stride * canvas->height;
+
+    Local<Object> buf = Nan::CopyBuffer(data, len).ToLocalChecked();
+    info.GetReturnValue().Set(buf);
 }
 
 /*
